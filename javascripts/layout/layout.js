@@ -181,7 +181,7 @@ with (Hasher('Application')) {
           div({ style: 'margin: 20px; min-height: 200px;' },
             TwitterSDK.share_button({ style: 'padding: 5px; width: 100px; display: inline-block;' }),
             TwitterSDK.follow_button({ style: 'padding: 5px; display: inline-block;' }),
-            FacebookSDK.like_button({ style: 'padding: 5px;' })
+            FacebookSDK.like_button({ style: 'padding: 5px; display: inline-block;' })
           )
         )
       )
