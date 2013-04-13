@@ -190,8 +190,8 @@ with (Hasher('Cart','Application')) {
 
       div({ 'class': 'sidebar' },
         info_message(
-          h3('Processing Transfers'),
-          p('It will only take a few moments to initiate the domain transfer' + (num_domains_in_cart != 1 ? 's' : '') + '.')
+          h3("Free Privacy!"),
+          p('Did you know free WHOIS privacy comes is enabled by default?')
         )
       ),
 

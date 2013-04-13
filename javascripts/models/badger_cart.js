@@ -92,7 +92,7 @@ var BadgerCart = {
           BadgerCart._execute_after_remove();
 
           // write to session storage
-          this.set_domains(domains);
+          BadgerCart.set_domains(domains);
           return destroyed_obj;
         }
       }
