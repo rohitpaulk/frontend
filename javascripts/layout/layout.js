@@ -151,8 +151,8 @@ with (Hasher('Application')) {
               li(a({ href: "#contact_us" }, 'Contact Us')),
               // li(a({ href: "#faqs" }, 'Frequently Asked Questions')),
               // li(a({ href: "#knowledge_center" }, 'Knowledge Center')),
-              li(a({ href: "http://community.badger.com/badger/products/badger_faqs", target: "_blank" }, 'Frequently Asked Questions')),
-              li(a({ href: "http://community.badger.com/badger/products/badger_knowledge_center", target: "_blank" }, 'Knowledge Center')),
+              // li(a({ href: "http://community.badger.com/badger/products/badger_faqs", target: "_blank" }, 'Frequently Asked Questions')),
+              // li(a({ href: "http://community.badger.com/badger/products/badger_knowledge_center", target: "_blank" }, 'Knowledge Center')),
               li(a({ href: 'https://github.com/badger/frontend', target: '_blank' }, 'Developers'))
             )
           ),
