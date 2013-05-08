@@ -160,7 +160,6 @@ with (Hasher('Application')) {
             h2('Connect With Us'),
             ul(
               li(a({ href: "mailto:support@badger.com", target: '_blank' }, 'support@badger.com')),
-              li(a({ href: 'tel:+1-415-787-5050' }, '+1-415-787-5050' )),
               li(
                 a({ href: "https://twitter.com/badger", target: "_blank" }, 'Twitter'),
                 ' / ',
