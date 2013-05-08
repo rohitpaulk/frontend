@@ -4,23 +4,6 @@ with (Hasher('ContactUs','Application')) {
     render(
       h1('Contact Us'),
       
-      div({ 'class': 'sidebar' },
-        info_message(
-          h3("Want to talk to a person?"),
-          p("Call us at ", a({ href: 'tel:+14157875050' }, '+1-415-787-5050' ), br(), "If we don't answer, leave a message and we'll get back to you as quickly as possible.")
-        ),
-        
-        info_message(
-          h3("Want to send us a letter?"),
-            "Badger", br(),
-            "548 Market St. #80135", br(),
-            "San Francisco, CA 94104-5401",
-            br(),
-            p(span({ style: 'font-weight: bold' }, "Postcards are great too!")
-          )
-        )
-      ),
-
       form({ 'class': 'fancy has-sidebar', action: submit_email, id: 'send-contact-us-form' },
         div({ id: 'send-contact-us-form-errors' }),
 
