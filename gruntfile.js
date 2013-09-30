@@ -119,17 +119,27 @@ module.exports = function (grunt) {
     },
     copy: {
       dist: {
-        files: [{
-          expand: true,
-          dot: true,
-          cwd: 'app',
-          dest: 'dist',
-          src: [
-            'favicon.ico',
-            'robots.txt',
-            'fonts/*'
-          ]
-        }]
+        files: [
+          {
+            expand: true,
+            dot: true,
+            cwd: 'app',
+            dest: 'dist',
+            src: [
+              'favicon.ico',
+              'robots.txt',
+            ]
+          },
+          {
+            expand: true,
+            dot: true,
+            cwd: 'app',
+            dest: 'dist/assets',
+            src: [
+              'fonts/**/*',
+            ]
+          }
+        ]
       }
     },
     md5: {
