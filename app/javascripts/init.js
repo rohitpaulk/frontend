@@ -8,6 +8,7 @@ if (document.location.host == 'www.badger.com') {
 } else if (navigator.userAgent == 'Selenium') {
   Badger.environment = 'test';
 } else {
+  Badger.dev_mode = true;
   Badger.environment = Badger.getCookie('badger_environment', { global: true}) || 'development';
 }
 
