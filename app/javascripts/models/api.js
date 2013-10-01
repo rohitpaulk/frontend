@@ -1,6 +1,4 @@
 var Badger = {
-  api_host: 'https://api.badger.com/',
-
   // Temporarily store data in session.
   // Uses the Session object defined in session.js.
   // Stores stringified data in window.name
@@ -146,20 +144,38 @@ var Badger = {
   *   Badger.setCookie('key','value', { expires_at: date().add(5).days() });
   *   Badger.setCookie('key','value');
   * */
+
+  cookieName: function(name) {
+    return Badger.environment + '_' + name;
+  },
+
   setCookie: function(name,value,options) {
     options = options || {};
-    var cookie = (value ? name+"="+value+"; path=/;" : name+"=; path=/;");
-    if (options.expires_at) cookie += "expires="+options.expires_at.toGMTString();
-    document.cookie = cookie;
+    if (!options.global) name = this.cookieName(name);
+
+    if (document.location.host == 'localhost') {
+      value ? window.localStorage.setItem(name, value) : window.localStorage.removeItem(name);
+    } else {
+      var cookie = (value ? name+"="+escape(value)+"; path=/;" : name+"=; path=/;");
+      if (options.expires_at) cookie += "expires="+options.expires_at.toGMTString();
+      document.cookie = cookie;
+    }
   },
   
-  getCookie: function(name) {
-    var ca = document.cookie.split(';');
-    for (var i=0; i < ca.length; i++) {
-      while (ca[i].charAt(0)==' ') ca[i] = ca[i].substring(1,ca[i].length);
-      if (ca[i].length > 0) {
-        var kv = ca[i].split('=');
-        if (kv[0] == name) return kv[1];
+  getCookie: function(name, options) {
+    options = options || {};
+    if (!options.global) name = this.cookieName(name);
+
+    if (document.location.host == 'localhost') {
+      window.localStorage.getItem(name);
+    } else {
+      var ca = document.cookie.split(';');
+      for (var i=0; i < ca.length; i++) {
+        while (ca[i].charAt(0)==' ') ca[i] = ca[i].substring(1,ca[i].length);
+        if (ca[i].length > 0) {
+          var kv = ca[i].split('=');
+          if (kv[0] == name) return unescape(kv[1]);
+        }
       }
     }
   },

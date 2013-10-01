@@ -154,7 +154,7 @@ html.demo { background: transparent url(../images/v2/white_plaster_demo.png) rep
 }
 
 #form-search input { 
-  background: #fff url(../images/v2/search.png?1) no-repeat 10px 10px;
+  background: #fff url(../images/v2/search.png) no-repeat 10px 10px;
 
 	border: solid 1px #C08547;
 	outline: none;
