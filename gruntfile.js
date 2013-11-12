@@ -233,10 +233,10 @@ module.exports = function (grunt) {
 
   grunt.registerTask('deploy', [
     'md5_path:css_js_cdn', // update angular templates with CDN urls to md5:binary files
-    'md5:css_js',        // create md5 copies of css/js in dist/compiled
-    'md5_path:html_cdn', // update root HTML with CDN'd css/js
-    's3:prod'        // copy all of compiled/ up to CDN
-    //'clean:dist_assets'  // clean up assets now that they're all up on CDN
+    'md5:css_js',          // create md5 copies of css/js in dist/compiled
+    'md5_path:html_cdn',   // update root HTML with CDN'd css/js
+    's3:prod',             // copy all of compiled/ up to CDN
+    'clean:dist_assets'    // clean up assets now that they're all up on CDN
   ]);
 
   grunt.registerTask('default', ['test']);
