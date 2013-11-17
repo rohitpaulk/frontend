@@ -9,7 +9,7 @@ module.exports = function (grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
   grunt.initConfig({
-    aws: (function() { try { return grunt.file.readYAML('../config/aws-s3.yml'); } catch(e) { return {}; }})(),
+    aws: (function() { try { return grunt.file.readYAML('../../config/aws-s3.yml'); } catch(e) { return {}; }})(),
     watch: {
       jshint: {
         files: ['gruntfile.js', 'app/javascripts/**/*.js', 'test/**/*.js'],
