@@ -3,7 +3,7 @@ if (document.location.host == 'www.badger.com') {
   Badger.google_analytics = 'UA-26014842-2';
 } else if (document.location.host == 'staging.badger.com') {
   Badger.environment = 'staging';
-} else if (document.location.host == 'demo.badger.com') {
+} else if ((document.location.host == 'demo.badger.com') || (document.location.host == 'staging-demo.badger.com')) {
   Badger.environment = 'demo';
 } else if (navigator.userAgent == 'Selenium') {
   Badger.environment = 'test';
