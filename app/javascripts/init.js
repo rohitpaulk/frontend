@@ -1,7 +1,7 @@
-if (document.location.host == 'www.badger.com') {
+if ((document.location.host == 'www.badger.com') || (document.location.host == 'admin.badger.com')) {
   Badger.environment = 'production';
   Badger.google_analytics = 'UA-26014842-2';
-} else if (document.location.host == 'staging.badger.com') {
+} else if ((document.location.host == 'staging.badger.com') || (document.location.host == 'staging-admin.badger.com')) {
   Badger.environment = 'staging';
 } else if ((document.location.host == 'demo.badger.com') || (document.location.host == 'staging-demo.badger.com')) {
   Badger.environment = 'demo';
