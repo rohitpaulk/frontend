@@ -7,8 +7,9 @@ with (Hasher('EmailForwards', 'DomainApps')) {
     icon: 'images/apps/email-forward.png',
     requires: {
       dns: [
-        { type: 'mx', priority: 10, content: "smtp.badger.com" },
-        { type: 'txt', content: 'v=spf1 mx mx:rhinonamesmail.com ~all' }
+        { type: 'mx', priority: 10, content: "mxa.mailgun.org" },
+        { type: 'mx', priority: 10, content: "mxb.mailgun.org" },
+        { type: 'txt', content: 'v=spf1 include:mailgun.org ~all' }
       ]
     },
 

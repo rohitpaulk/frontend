@@ -8,8 +8,8 @@ with (Hasher('WebForwards', 'DomainApps')) {
     
     requires: {
       dns: [
-        { type: 'a', content: "165.225.134.233" },
-        { type: 'a', subdomain: '*', content: "165.225.134.233" }
+        { type: 'a', content: "54.204.41.210" },
+        { type: 'a', subdomain: '*', content: "54.204.41.210" }
       ]
     },
 
