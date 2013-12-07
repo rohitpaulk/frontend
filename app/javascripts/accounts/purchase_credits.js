@@ -42,6 +42,7 @@ with (Hasher('Billing','Application')) {
         )
       )
     );
+    BraintreeData.setup("8dhxrjyz7nwpn9yf", 'credits-form', BraintreeData.environments.production);
 
     // update price with discount if available
     Account.if_referral_signup_discount(function() {
@@ -62,7 +63,7 @@ with (Hasher('Billing','Application')) {
       $("input#credits-input").trigger('keyup');
     });
   });
-  
+
 
   define('saved_card_drop_down_and_fields', function() {
     var saved_or_new_card_div = div(
@@ -71,10 +72,10 @@ with (Hasher('Billing','Application')) {
         select(option('Loading...'))
       )
     );
-    
+
     BadgerCache.getAccountInfo(function(response) {
       var default_contact = response.data;
-      
+
       BadgerCache.getPaymentMethods(function(response) {
         var payment_methods = response.data;
 
@@ -85,7 +86,7 @@ with (Hasher('Billing','Application')) {
         });
       });
     });
-    
+
     return saved_or_new_card_div;
   });
 
@@ -101,7 +102,7 @@ with (Hasher('Billing','Application')) {
         ),
 
         span({ id: 'save_card_container', style: (payment_methods.length > 0 ? 'display: none' : '' ) },
-          input({ type: 'checkbox', name: 'save_card', checked: 'checked', style: 'margin-left: 20px', id: 'save_card-checkbox' }), 
+          input({ type: 'checkbox', name: 'save_card', checked: 'checked', style: 'margin-left: 20px', id: 'save_card-checkbox' }),
           label({ 'class': 'normal', 'for': 'save_card-checkbox'  }, ' Keep this card on file')
         )
       ),
@@ -175,20 +176,20 @@ with (Hasher('Billing','Application')) {
       )
     );
   });
-  
+
   // reads from Badger.Session to get the number of Credits just added to the account,
   // and renders and info message into the div
   define('show_num_credits_added', function() {
     var credits_added = Badger.Session.remove('credits_added');
     if (!credits_added) return div();
-    
+
     var arguments = flatten_to_array(arguments);
     var options = shift_options_from_args(arguments);
-    
+
     var message = info_message("You have added ", credits_added, " ", credits_added <= 1 ? "Credit" : "Credits", " to your account.");
     return div(options, message);
   });
-  
+
 
   define('hide_or_show_new_card_fields', function() {
     if ($('#payment_method_id').val() == '0') {
@@ -199,9 +200,9 @@ with (Hasher('Billing','Application')) {
       $('#save_card_container,#new_card_container').hide();
     }
   });
-  
+
   //$('#save_card_container,#new_card_container')
-  
+
   define('purchase_credits', function(form_data) {
     if (form_data.credits == '1' && form_data.credits_variable) form_data.credits = form_data.credits_variable;
     delete form_data.credits_variable;
@@ -213,23 +214,23 @@ with (Hasher('Billing','Application')) {
       if (response.meta.status == 'ok') {
         BadgerCache.reload('account_info');
         BadgerCache.reload('payment_methods');
-        
+
         // save the number of credits that were just purchased to show a customized message
         Badger.Session.write({
           credits_added: response.data.num_credits // Badger.Session.get('necessary_credits')
         });
         Badger.Session.remove('necessary_credits');
-        
+
         BadgerCache.getAccountInfo(function(response) {
           update_credits();
-          
+
           if (redirect_url = Badger.Session.get('redirect_url')) {
             Badger.Session.remove('redirect_url');
             set_route(redirect_url);
           } else {
             set_route('#account/billing');
           }
-          
+
           // if a callback was provided, pull that off and execute it
           // if (callback = Badger.Session.get('callback')) {
           //   Badger.Session.remove('callback');
@@ -245,11 +246,11 @@ with (Hasher('Billing','Application')) {
 
   define('credits_selector', function(necessary_credits) {
     // var necessary_credits = typeof(necessary_credits) == "undefined" ? 0 : parseInt(necessary_credits);
-    
+
     var credits_selector_div = div({ id: "credits-selector" },
       input({ style: "font-size: 30px; text-align: center; width: 50px", name: "credits", id: 'credits-input', maxlength: 3, value: necessary_credits > 0 ? necessary_credits : 1, size: "2" })
     );
-    
+
     jQuery.fn.ForceNumericOnly = function() {
       return this.each(function()
       {
@@ -257,7 +258,7 @@ with (Hasher('Billing','Application')) {
           var key = e.charCode || e.keyCode || 0;
           // allow backspace, tab, delete, arrows, numbers and keypad numbers ONLY
           return (
-            key == 8 || 
+            key == 8 ||
             key == 9 ||
             key == 46 ||
             (key >= 37 && key <= 40) ||
@@ -267,22 +268,22 @@ with (Hasher('Billing','Application')) {
         });
       });
     };
-    
+
     $(credits_selector_div).find('input').ForceNumericOnly();
 
-    var tier; //track the credit tier    
+    var tier; //track the credit tier
     var previous_tier = 1;
     var num_credits = 0;
-    
+
     var updateCreditsFieldsAndTierSelected = function(inputField, force) {
       force = typeof(force) == 'undefined' ? false : force;
-      
+
       if ( $(inputField).val() ) {
         num_credits = parseInt($(inputField).val());
       } else {
         num_credits = 0;
       }
-      
+
       var price = 10;
       // if ( num_credits == 1) {
       //   price = 12;
@@ -297,23 +298,23 @@ with (Hasher('Billing','Application')) {
       //   price = 0;
       //   tier = -1;
       // }
-      
+
       //update the price fields
       $('#price-each').empty().append("$" + price.toString());
       $('#price-total').empty().append("$" + (price * num_credits).toString());
-      $('#price-savings').empty().append("$" + (num_credits*15 - price*num_credits).toString())        
-  
+      $('#price-savings').empty().append("$" + (num_credits*15 - price*num_credits).toString())
+
       // change text on the purchase button
       $("#purchase-button").attr("value", "Purchase " + num_credits + (num_credits == 1 ? " Credit" : " Credits") + " for $" + (price*num_credits));
       $("#static-price").html("$" + (price*num_credits));
-      
+
       // how/hide savings
       if (num_credits >= 2) {
         $("#savings").show();
       } else {
         $("#savings").hide();
       }
-      
+
       // update discount field
       // update_discount_price();
 
@@ -326,25 +327,25 @@ with (Hasher('Billing','Application')) {
       //     $("#credit-tier-" + previous_tier).css({ "background": "#E6F8D8", "border-width": "1px" }); // change back to unselected
       //   }
       // }
-      
+
       pervious_num_credits = num_credits;
       previous_tier = tier;
     };
-    
+
     $(credits_selector_div).find('input[name=credits]').keyup(function(e) {
       if( $(this).is(":focus") ) {
         updateCreditsFieldsAndTierSelected(this);
       }
     });
-    
+
     // update fields on page load
     $(function() {
       updateCreditsFieldsAndTierSelected($(credits_selector_div).find('input[name=credits]'), true);
     });
-    
+
     return credits_selector_div;
   });
-  
+
   define('update_credits_input_with', function(num_credits) {
     $('input[name=credits]').val(num_credits);
     $('input[name=credits]').select();
@@ -369,7 +370,7 @@ with (Hasher('Billing','Application')) {
         })()
       )
     )
-  }); 
+  });
 
   define('credits_table', function() {
     return div({ id: "credits-table" },
@@ -387,5 +388,5 @@ with (Hasher('Billing','Application')) {
         )
       ))
     );
-  });  
+  });
 }
