@@ -101,13 +101,13 @@ with (Hasher('Cart','Application')) {
         )
       )
     );
-    
+
 
     Account.if_referral_signup_discount(function() {
       $('#purchase-button').val('Purchase ' + cart_contents.domains.length + ' domain' + (cart_contents.domains.length != 1 ? 's' : '') + ' for $' + (BadgerCart.compute_price() - 5))
     });
-    
-    
+
+
   });
 
   route('#cart/billing', function() {
@@ -160,7 +160,8 @@ with (Hasher('Cart','Application')) {
           )
         )
       );
-      
+      BraintreeData.setup("8dhxrjyz7nwpn9yf", 'credits-form', BraintreeData.environments.production);
+
       Account.if_referral_signup_discount(function() {
         if (Badger.Session.get('necessary_credits')) {
           // update discounted price from session storage
@@ -172,7 +173,7 @@ with (Hasher('Cart','Application')) {
           );
         }
       });
-      
+
     });
   });
 
@@ -399,7 +400,7 @@ with (Hasher('Cart','Application')) {
           // come back in a few seconds and see if it's sync'ed yet
           return setTimeout(curry(update_row_for_domain_in_cart, server_domain_obj, callback), 3000);
         }
-        
+
         // if this point is reached, the domain is invalid somehow, and should be removed from the cart
         cart_domain.remove_from_cart();
         update_shopping_cart_size();
