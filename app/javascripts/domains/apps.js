@@ -2,7 +2,7 @@ with (Hasher('Application')) {
   // TODO: this desperately needs to be cached
   define('load_domain', function(domain, callback) {
     var that = this;
-    
+
     Badger.getDomain(domain, function(response) {
       if (response.meta.status == 'ok') {
         callback.call(that, response.data);
@@ -14,7 +14,7 @@ with (Hasher('Application')) {
 };
 
 with (Hasher('DomainApps','Domains')) {
-  
+
   define('h1_for_domain', function(domain, current_header) {
     return chained_header_with_links(
       { text: 'Domains', href: '#domains' },
@@ -23,13 +23,13 @@ with (Hasher('DomainApps','Domains')) {
       { text: current_header }
     );
   });
-  
+
   define('with_domain_nav_for_app', function(domain, app, callback) {
     var active_url = get_route();
-    
+
     BadgerCache.getDomain(domain, function(response) {
       var domain_obj = response.data || {};
-      
+
       if (!['dns'].includes(app.id) && !(domain_obj.permissions_for_person||[]).includes('modify_dns') && !(domain_obj.permissions_for_person||[]).includes('change_nameservers')) {
         render(
           chained_header_with_links(
@@ -38,7 +38,7 @@ with (Hasher('DomainApps','Domains')) {
             { text: 'Apps', href: '#domains/' + domain_obj.name },
             { text: app.name }
           ),
-          
+
           unauthorized_message('You do not have permission to view this application.')
         );
       } else {
@@ -64,7 +64,7 @@ with (Hasher('DomainApps','Domains')) {
       }
     });
   });
-  
+
   define('render_all_application_icons', function(options) {
     var domain_obj = options.domain_obj,
         apps_per_row = options.apps_per_row || 6,
@@ -72,10 +72,10 @@ with (Hasher('DomainApps','Domains')) {
         available_apps = div({ id: 'available-apps' }),
         installed_apps_count = 0,
         available_apps_count = 0;
-    
+
     // filter out applications
     var filter = options.filter || function(){ return true; };
-    
+
     for (var key in Hasher.domain_apps) {
       var app = Hasher.domain_apps[key];
       if (app.menu_item) {
@@ -113,7 +113,7 @@ with (Hasher('DomainApps','Domains')) {
         }
       }
     }
-    
+
     return div(
       (function() {
         if (installed_apps_count > 0) {
@@ -124,7 +124,7 @@ with (Hasher('DomainApps','Domains')) {
           );
         }
       })(),
-      
+
       (function() {
         if (available_apps_count > 0 && (((domain_obj.permissions_for_person || []).indexOf('modify_dns') >= 0) || ((domain_obj.permissions_for_person || []).indexOf('change_nameservers') >= 0))) {
           return div({ style: 'margin: 10px auto;' },
@@ -136,7 +136,7 @@ with (Hasher('DomainApps','Domains')) {
       })()
     );
   });
-  
+
   define('install_app_button_clicked', function(app, domain_obj, form_data) {
     if (form_data.install_on_subdomain && form_data.subdomain == "") {
       $('#subdomain-input-error').removeClass('hidden');
@@ -148,6 +148,8 @@ with (Hasher('DomainApps','Domains')) {
   });
 
   define('install_app_success', function(app, domain_obj) {
+    Badger.postApplicationHook('install', app, domain_obj)
+
     hide_modal();
     $('#domain-menu-item-' + domain_obj.name.replace('.','-')).remove();
     set_route(app.menu_item.href.replace(':domain', domain_obj.name));
@@ -174,7 +176,7 @@ with (Hasher('DomainApps','Domains')) {
                   })
                 ))
               ] : [
-                div({ style: 'text-align: right' }, 
+                div({ style: 'text-align: right' },
                   a({ id: conflict_app.id + '_uninstall_button', 'class': 'myButton small', href: curry(remove_conflict_app, app, conflict_app, domain, form_data) }, 'Uninstall'),
                   img({ id: conflict_app.id + '_uninstall_spinner', 'class': 'hidden', src: 'images/ajax-loader.gif' })
                 )
@@ -213,14 +215,14 @@ with (Hasher('DomainApps','Domains')) {
     });
   });
 
-  define('show_modal_install_app', function(app, domain_obj) {  
+  define('show_modal_install_app', function(app, domain_obj) {
     show_modal(
       h1({ 'class': 'long-domain-name' }, app.name, " for ", domain_obj.name),
 
-      ((app.requires && app.requires.dns && domain_obj.name_servers.join(',') != 'ns1.badger.com,ns2.badger.com') ? 
-        div({ 'class': 'error-message', style: 'margin-top: 20px' }, 
-          "Please install Badger DNS and try again.", 
-          span({ style: 'padding-right: 20px'}, ' '), 
+      ((app.requires && app.requires.dns && domain_obj.name_servers.join(',') != 'ns1.badger.com,ns2.badger.com') ?
+        div({ 'class': 'error-message', style: 'margin-top: 20px' },
+          "Please install Badger DNS and try again.",
+          span({ style: 'padding-right: 20px'}, ' '),
           div({ style: 'float: right' }, a({ 'class': 'myButton small', href: curry(DnsApp.change_name_servers_modal, domain_obj) }, 'Install Badger DNS'))
         )
       : app.install_screen ? app.install_screen(app, domain_obj) : [
@@ -231,7 +233,7 @@ with (Hasher('DomainApps','Domains')) {
               th({ style: 'padding: 0 20px' }, 'Type'),
               th({ style: 'width: 100%' }, 'Target')
             ),
-            for_each(app.requires.dns, function(dns) { 
+            for_each(app.requires.dns, function(dns) {
               return tr(
                 td({ style: 'text-align: right; padding-right: 20px' }, dns.subdomain, span({ style: 'color: #aaa' }, dns.subdomain ? '.' : '', Domains.truncate_domain_name(domain_obj.name))),
                 td({ style: 'padding: 0 20px' }, dns.type.toUpperCase()),
@@ -242,7 +244,7 @@ with (Hasher('DomainApps','Domains')) {
           )
         ),
 
-        div({ style: 'padding-top: 20px; text-align: right' }, 
+        div({ style: 'padding-top: 20px; text-align: right' },
           a({ 'class': 'myButton', href: curry(install_app_button_clicked, app, domain_obj) }, 'Install ', app.name)
         )
       ])
@@ -311,10 +313,10 @@ with (Hasher('DomainApps','Domains')) {
     )));
   });
 
-  define('show_needs_badger_nameservers_modal', function(app, domain_obj) {  
+  define('show_needs_badger_nameservers_modal', function(app, domain_obj) {
     show_modal(
       h1('First, install Badger DNS?'),
-      div({ style: 'padding-top: 20px; text-align: right' }, 
+      div({ style: 'padding-top: 20px; text-align: right' },
         a({ 'class': 'myButton', href: curry(install_app_button_clicked, app, domain_obj) }, 'Install Badger Nameservers')
       )
     )
@@ -326,8 +328,8 @@ with (Hasher('DomainApps','Domains')) {
       h1('Settings for ', app.name),
       p("If you'd like to uninstall this application, click the uninstall button below."),
       div({ style: "text-align: right; margin-top: 30px" },
-        a({ 
-          'class': 'myButton', 
+        a({
+          'class': 'myButton',
           href: function() {
             load_domain(domain, function(domain_obj) {
               remove_app_from_domain(app, domain_obj);
@@ -340,13 +342,13 @@ with (Hasher('DomainApps','Domains')) {
       )
     )
   });
-        
+
   define('domain_app_settings_button', function(app_id, domain) {
-    return div({ style: 'float: right; margin-top: -44px' }, 
+    return div({ style: 'float: right; margin-top: -44px' },
       a({ 'class': 'myButton small', href: curry(show_settings_modal_for_app, app_id, domain) }, 'Settings')
     );
   });
-  
+
 
 
 
@@ -361,7 +363,7 @@ with (Hasher('DomainApps','Domains')) {
     Hasher.domain_apps[options.id] = options;
     return Hasher.domain_apps[options.id];
   });
-  
+
   define('app_is_installed_on_domain', function(app, domain_obj) {
     if (app.is_installed) return app.is_installed.call(null, domain_obj);
 
@@ -397,10 +399,10 @@ with (Hasher('DomainApps','Domains')) {
         break;
       }
     }
-    
+
     return true;
   });
-  
+
   // Desperately needs refactoring
   define('domain_has_record', function(domain_obj, record) {
     for (var i=0; i < (domain_obj.dns || []).length; i++) {
@@ -460,14 +462,14 @@ with (Hasher('DomainApps','Domains')) {
 
       if (content_matches && type_matches && subdomain_matches && priority_matches && port_matches && weight_matches && target_matches && name_matches && service_matches) return tmp_record;
     }
-    
+
     return false;
   });
 
   define('install_app_on_domain', function(app, domain_obj, form_data, need_confirm) {
     var tmp_app = $.extend(true, {}, app);
     var dns_required = (form_data.install_on_subdomain ? app.requires.subdomain_dns : app.requires.dns)
-    
+
     BadgerCache.flush('domains');
 
     for_each(dns_required, function(record) {
@@ -563,6 +565,7 @@ with (Hasher('DomainApps','Domains')) {
         });
       }
     });
+    Badger.postApplicationHook('uninstall', app, domain_obj)
   });
 
   define('existing_conflict_record', function(installed_app_records, record, domain_name) {
@@ -681,7 +684,7 @@ with (Hasher('DomainApps','Domains')) {
 
 
 // with (Hasher('Application')) {
-// 
+//
 // }
 
 
@@ -689,10 +692,10 @@ with (Hasher('DomainApps','Domains')) {
 //     name: domain,
 //     records: records
 //   };
-// 
+//
 //   console.log(data);
 //   render({ target: elem },
-// 
+//
 // Badger.getRecords(domain, function(records) {
 //   console.log(domain_obj)
 
@@ -701,10 +704,10 @@ with (Hasher('DomainApps','Domains')) {
 //   route({
 //     '#domains/:domain/applications': 'show'
 //   });
-// 
+//
 //   define('show', function(domain) {
 //    var apps = [
-//      { 
+//      {
 //        name: 'Installed Applications',
 //        apps: [
 //          { name: 'DNS', icon: 'images/apps/badger.png' },
@@ -712,8 +715,8 @@ with (Hasher('DomainApps','Domains')) {
 //          { name: 'URL Forwarding', icon: 'images/apps/badger.png' }
 //        ]
 //      },
-// 
-//      { 
+//
+//      {
 //        name: 'Popular Applications',
 //        apps: [
 //          { name: 'Google Apps', icon: 'images/apps/googleapps.png' },
@@ -722,8 +725,8 @@ with (Hasher('DomainApps','Domains')) {
 //           { name: 'Wordpress', icon: 'images/apps/wordpress.png' }
 //        ]
 //      },
-// 
-//      { 
+//
+//      {
 //        name: 'Advanced Applications',
 //        apps: [
 //          { name: 'Public Whois', icon: 'images/apps/badger.png' },
@@ -731,9 +734,9 @@ with (Hasher('DomainApps','Domains')) {
 //        ]
 //      }
 //    ];
-// 
+//
 //     // var apps = [
-//     //  { 
+//     //  {
 //     //    name: 'Profiles',
 //     //    apps: [
 //     //      { name: 'About.me', icon: 'images/apps/aboutme.png' },
@@ -757,31 +760,31 @@ with (Hasher('DomainApps','Domains')) {
 //     //    ]
 //     //  }
 //     // ];
-//  
+//
 //     render('show', domain, apps);
-//     // 
+//     //
 //     // Badger.getDomain(domain, function(response) {
 //     //   render('show_with_data', domain, response.data);
 //     // });
 //   });
-// 
+//
 //  define('show_app_dialog', function(domain, app) {
 //    var normalized_name = app.name.toLowerCase().replace(/[^a-z]/g,'_');
 //     show_modal(DomainApps.() + normalized_name + '_install_modal', domain, app);
 //  });
-// 
+//
 //  // }
-// 
-// with (Hasher('DomainApps', 'Application')) { 
-// 
-// 
+//
+// with (Hasher('DomainApps', 'Application')) {
+//
+//
 //  // define('show', function(domain) {
 //  //   return div(
 //  //     h1(domain),
 //  //     p('Loading data for ' + domain + '...')
 //  //   );
 //  // });
-//  // 
+//  //
 //  // define('show_with_data', function(domain, data) {
 //  //   return div(
 //  //     h1(domain),
@@ -826,7 +829,7 @@ with (Hasher('DomainApps','Domains')) {
 //   initializer(function() {
 //     Hasher.models = {};
 //   });
-//   
+//
 //   define('find', function(key) {
 //     alert('find: ' + key)
 //     console.log(Hasher.models)
@@ -837,12 +840,12 @@ with (Hasher('DomainApps','Domains')) {
 //     }
 //   });
 // }
-// 
+//
 // with (Hasher('Domain', 'Model')) {
 //   initializer(function() {
 //     Hasher.active_domains_count_spans = [];
 //   });
-//   
+//
 //   define('span_active_domains_count', function() {
 //     var elem = element('span', '--active_domains--');
 //     Hasher.active_domains_count_spans.push(elem);
@@ -856,21 +859,21 @@ with (Hasher('DomainApps','Domains')) {
 //   alert("check menu")
 // });
 
-// 
+//
 // with (Hasher('Model')) {
 // }
-// 
+//
 // with (Hasher('DomainApp', 'Model')) {
 //   define('register', function(name, callback) {
 //   });
 // }
-// 
+//
 
 
 // define('hide_modal', function() {
 //   hide_modal();
 // });
-// 
+//
 // define('modal', function(callback) {
 //   curry(show_modal, 'DNS.change_name_servers_modal', domain_info);
 //   callback()
@@ -878,7 +881,7 @@ with (Hasher('DomainApps','Domains')) {
 
 // initializer(function() {
 //   console.log("TODO: register GoogleApps as an app for a domain");
-// 
+//
 // });
 
 // this isnt quite right
@@ -896,7 +899,7 @@ with (Hasher('DomainApps','Domains')) {
 //   initializer(function() {
 //     console.log('hi')
 //   });
-//   
+//
 //  // }
 
 
@@ -914,13 +917,13 @@ with (Hasher('DomainApps','Domains')) {
 
 // with (Hasher('BadgerDns', 'DomainApp')) {
 //   add_side_nav('Badger DNS', '#/');
-// 
+//
 //   register('badger_dns', function() {
-//     
+//
 //   });
 // }
-// 
+//
 // with (Hasher('DomainAppController', 'Application')) {
-//   
+//
 // }
 

@@ -22,14 +22,15 @@ with (Hasher('EmailForwards', 'DomainApps')) {
         )
       );
     }
+
   });
-  
+
   route('#domains/:domain/apps/email_forwards', function(domain) {
     with_domain_nav_for_app(domain, Hasher.domain_apps['badger_email_forward'], function(nav_table, domain_obj) {
       render(
         div({ id: 'email-forwards-wrapper' },
           h1_for_domain(domain, 'Email Forwards'),
-          
+
           nav_table(
             domain_app_settings_button('badger_email_forward', domain),
 
@@ -59,7 +60,7 @@ with (Hasher('EmailForwards', 'DomainApps')) {
 
       Badger.getEmailForwards(domain, function(results) {
         if (results.meta.status != 'ok') return;
-        
+
         var the_tbody = $('#email-forwards-table-tbody');
         (results.data || []).map(function(email_forward) {
           the_tbody.append(show_email_forward_table_row(domain, email_forward));
@@ -67,7 +68,7 @@ with (Hasher('EmailForwards', 'DomainApps')) {
       });
     });
   });
-  
+
   define('show_email_forward_table_row', function(domain, email_forward) {
     return tr({ id: 'id-' + (email_forward.username == '*' ? '' : email_forward.username) },
       td(div({ 'class': 'long-domain-name', style: 'width: 380px;' }, email_forward.username, "@", domain)),
@@ -78,30 +79,30 @@ with (Hasher('EmailForwards', 'DomainApps')) {
       )
     );
   })
-  
-  
+
+
   define('create_email_forward', function(domain, form_data) {
     $('#email-forwards-errors').empty();
-    
+
     Badger.createEmailForward(domain, form_data, function(response) {
       if(response.meta.status == 'ok') {
         hide_modal();
         $('#input-username').val('').blur();
         $('#input-destination').val('').blur();
-        
+
         $('#email-forwards-table').append( show_email_forward_table_row(domain, response.data) );
       } else {
         $('#email-forwards-errors').empty().append(
           error_message(response)
         );
       }
-      
+
     });
   });
-  
+
   define('delete_email_forward', function(domain, email_forward) {
     $('#email-forwards-errors').empty();
-    
+
     if( confirm('Delete email forward ' + email_forward.username + '@' + domain + '?') ) {
       Badger.deleteEmailForward(domain, email_forward.id, function(response) {
         if(response.meta.status != 'ok') {
@@ -114,6 +115,6 @@ with (Hasher('EmailForwards', 'DomainApps')) {
       });
     }
   });
-  
-    
+
+
  };

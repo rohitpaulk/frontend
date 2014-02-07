@@ -7,26 +7,26 @@ var Badger = {
     // only really useful for debugging.
     inspect: function() {
       var sessionVars = {};
-      var keys = Object.keys(Session).slice(1);      
-      
+      var keys = Object.keys(Session).slice(1);
+
       for (i in keys) {
         if (key = keys[i]) sessionVars[key] = Session[key];
       }
-      
+
       return sessionVars;
     },
-    
+
     // write the variable to session variables.
     write: function(sessvars) {
       for (k in sessvars) {
         Session[k] = sessvars[k];
       }
     },
-    
+
     set: function(key,value) {
       Session[key] = value;
     },
-    
+
     // read the key/value from session and return value
     // if multiple keys provided, returns a hash of key => value
     get: function() {
@@ -34,7 +34,7 @@ var Badger = {
         var key = arguments[0];
         return Session[key];
       }
-      
+
       var sessionVars = {};
       for (var i = 0; i < arguments.length; i++) {
         var key = arguments[i];
@@ -42,7 +42,7 @@ var Badger = {
       }
       return sessionVars;
     },
-    
+
     // delete the key/value from session and return value
     // if multiple keys provided, returns a hash of key => value
     remove: function() {
@@ -52,7 +52,7 @@ var Badger = {
         delete Session[key];
         return value;
       }
-      
+
       var sessionVars = {};
       for (var i = 0; i < arguments.length; i++) {
         var key = arguments[i];
@@ -62,7 +62,7 @@ var Badger = {
       }
       return sessionVars;
     },
-    
+
     clear: function() {
       var keys = Object.keys(Session).slice(1);
       for (i in keys) {
@@ -70,7 +70,7 @@ var Badger = {
       }
     }
   },
-  
+
   api: function() {
     // parse arguments: url, [http_method], [params], [callback]
     var args = Array.prototype.slice.call(arguments, 0);
@@ -80,7 +80,7 @@ var Badger = {
     var method = typeof(args[0]) == 'string' ? args.shift() : 'GET';
     var params = typeof(args[0]) == 'object' ? args.shift() : {};
     var callback = typeof(args[0]) == 'function' ? args.shift() : function(){};
-    
+
     // callback sequence number
     Badger.callback_sequence = (Badger.callback_sequence || 0) + 1;
     var callback_name = 'callback_' + Badger.callback_sequence;
@@ -97,11 +97,11 @@ var Badger = {
 
       url += key + '=' + encodeURIComponent(params[key]||'');
     }
-    
-    
+
+
     // TODO: alert if url is too long
 
-    var script = document.createElement("script");        
+    var script = document.createElement("script");
     script.async = true;
     script.type = 'text/javascript';
     script.src = url;
@@ -131,7 +131,7 @@ var Badger = {
     var head = document.getElementsByTagName('head')[0];
     head.appendChild(script);
   },
-  
+
   jsonp_callbacks: {},
 
   /*
@@ -161,7 +161,7 @@ var Badger = {
       document.cookie = cookie;
     }
   },
-  
+
   getCookie: function(name, options) {
     options = options || {};
     if (!options.global) name = this.cookieName(name);
@@ -179,7 +179,7 @@ var Badger = {
       }
     }
   },
-  
+
   setInviteCode: function(invite_code) {
     Badger.setCookie('invite_code', invite_code);
     //if (typeof(_gaq) != 'undefined') _gaq.push(['_trackPageview', path + '?utm_source.....']);
@@ -188,12 +188,12 @@ var Badger = {
   getInviteCode: function() {
     return Badger.getCookie('invite_code');
   },
-  
+
   // reads from "badger_access_token" cookie
   getAccessToken: function() {
     return Badger.getCookie('badger_access_token');
   },
-  
+
   // writes to "badger_access_token" cookie
   setAccessToken: function(token) {
     Badger.setCookie('badger_access_token', token);
@@ -203,17 +203,17 @@ var Badger = {
     Badger.require_auth_callbacks.push(callback);
   },
   require_auth_callbacks: [],
-  
+
   onLogin: function(callback) {
     Badger.login_callbacks.push(callback);
   },
   login_callbacks: [],
-  
+
   onLogout: function(callback) {
     Badger.logout_callbacks.push(callback);
   },
   logout_callbacks: [],
-  
+
   // given email+password, returns an access token
   login: function(options, callback) {
     Badger.api("/account/access_token", options, function(response) {
@@ -235,7 +235,7 @@ var Badger = {
   requireAuth: function() {
     for (var i=0; i < Badger.require_auth_callbacks.length; i++) Badger.require_auth_callbacks[i].call(null);
   },
-  
+
   accountInfo: function(callback) {
     Badger.api("/account/info", callback);
   },
@@ -243,7 +243,7 @@ var Badger = {
   requestInvite: function(email, callback) {
     Badger.api("/account/request_invite", 'POST', { email: email }, callback);
   },
-  
+
   // new invite request redemption
   requestInviteAndCreatePerson: function(form_data, callback) {
     Badger.api("/account/request_invite_and_create_person", 'POST', form_data, callback);
@@ -264,15 +264,15 @@ var Badger = {
       if (callback) callback(response);
     });
   },
-  
+
   updateAccount: function(data, callback) {
     Badger.api("/account/update_authorized_account", 'PUT', data, callback);
   },
-  
+
   domainSearch: function(query, use_serial, callback) {
     Badger.__search_serial_next = (Badger.__search_serial_next || 1) + 1;
     Badger.__search_serial_last = (Badger.__search_serial_last || 0);
-    
+
     Badger.api("/domains/search", 'POST', { query: query, serial: Badger.__search_serial_next }, function(results) {
       // Log domain searches
       // if (results.data.domains) {
@@ -280,11 +280,11 @@ var Badger = {
       //     Badger.createDomainSearchHistory({ query: domain[0], available: domain[1] });
       //   });
       // }
-      
+
       if (!use_serial || parseInt(results.data.serial) > Badger.__search_serial_last) {
         Badger.__search_serial_last = parseInt(results.data.serial);
         callback(results);
-      }      
+      }
     });
   },
 
@@ -293,7 +293,7 @@ var Badger = {
       callback(response);
     });
   },
-  
+
   getDomainsForLinkedAccount: function(linked_account_id, callback) {
     Badger.api("/domains", { linked_account_id: linked_account_id }, function (response) {
       callback(response.data);
@@ -305,18 +305,22 @@ var Badger = {
       callback = params;
       params = {};
     }
-    
+
     Badger.api("/domains/" + name, params, function(response) {
       callback(response);
     });
   },
-  
+
+  postApplicationHook: function(action, app, domain) {
+    Badger.api("/domains/" + domain.name + "/application_hook", 'POST', {app_action: action, app: app.id});
+  },
+
   getRecords: function(name, callback) {
-    Badger.api("/domains/" + name + "/records", function(response) { callback(response.data); });   
+    Badger.api("/domains/" + name + "/records", function(response) { callback(response.data); });
   },
 
   addRecord: function(name, data, callback) {
-    Badger.api("/domains/" + name + "/records", 'POST', data, callback);   
+    Badger.api("/domains/" + name + "/records", 'POST', data, callback);
   },
 
   deleteRecord: function(name, id, callback) {
@@ -342,7 +346,7 @@ var Badger = {
     //delete data.name; // bad to modify the passed in object... should clone first
     Badger.api("/domains/" + name + "/transfer", 'POST', data, callback);
   },
-  
+
 
   tryAuthCodeForTransfer: function(domain_name, auth_code, callback) {
     Badger.api("/domains/" + domain_name + "/try_auth_code", 'POST', { auth_code: auth_code }, callback);
@@ -351,11 +355,11 @@ var Badger = {
   retryRejectedTransfer: function(domain_name, callback) {
     Badger.api("/domains/" + domain_name + "/retry_rejected_transfer", 'POST', callback);
   },
-  
+
   // bulkTransferDomains: function(registrant_contact_id, domain_names, callback) {
   //   Badger.api("/domains/bulk_transfer", 'POST', { registrant_contact_id: registrant_contact_id, domain_names: domain_names }, callback);
   // },
-  
+
   cancelDomainTransfer: function(domain_name, callback) {
     Badger.api("/domains/" + domain_name + "/cancel_transfer", 'POST', callback);
   },
@@ -365,7 +369,7 @@ var Badger = {
   },
 
   updateDomain: function(domain, options, callback) {
-    Badger.api("/domains/" + domain, 'PUT', options, callback); 
+    Badger.api("/domains/" + domain, 'PUT', options, callback);
   },
 
   getContacts: function(callback) {
@@ -373,18 +377,18 @@ var Badger = {
       if (response.data) {
         response.data = (response.data || []).map(function(contact) {
           contact.needs_update = false;
-          
+
           for (key in contact) {
             if (contact[key] && contact[key].toString().match(/^UNKNOWN$/)) {
               contact[key] = undefined;
               contact.needs_update = true;
             }
           }
-          
+
           return contact;
         });
       }
-      
+
       callback(response);
     });
   },
@@ -418,7 +422,7 @@ var Badger = {
   purchaseCredits: function(data, callback) {
     if(!data.payment_method_id) data.payment_method_id = "0"
     if(!data.cc_expiration_date) data.cc_expiration_date = data.cc_expiration_date_month + "/" + data.cc_expiration_date_year
-    
+
     Badger.api("/account/purchase_credits", 'POST', Badger.braintreeEncrypt(data), callback);
   },
 
@@ -456,11 +460,11 @@ var Badger = {
   changeName: function(data, callback) {
     Badger.api("/account/change_name", 'POST', data, callback);
   },
-  
+
   changeHideShareMessages: function(value, callback) {
     Badger.api("/account/change_hide_share_messages", 'POST', { hide_share_messages: value }, callback);
-  }, 
-  
+  },
+
   sendEmail: function(data, callback) {
     Badger.api("account/contact_us", "POST", data, callback);
   },
@@ -468,15 +472,15 @@ var Badger = {
   getEmailForwards: function(domain, callback) {
     Badger.api("domains/" + domain + "/email_forwards", callback);
   },
-  
+
   createEmailForward: function(domain, data, callback) {
     Badger.api("domains/" + domain + "/email_forwards", "POST", data, callback);
   },
-  
+
   updateEmailForward: function(domain, id, data, callback) {
     Badger.api("domains/" + domain + "/email_forwards/" + id, "PUT", data, callback);
   },
-  
+
   deleteEmailForward: function(domain, id, callback) {
     Badger.api("domains/" + domain + "/email_forwards/" + id, "DELETE", callback);
   },
@@ -484,25 +488,25 @@ var Badger = {
   getWebForwards: function(domain, callback) {
     Badger.api("domains/" + domain + "/web_forwards", callback);
   },
-  
+
   createWebForward: function(domain, data, callback) {
     Badger.api("domains/" + domain + "/web_forwards", "POST", data, callback);
   },
-  
+
   updateWebForward: function(domain, id, data, callback) {
     Badger.api("domains/" + domain + "/web_forwards/" + id, "PUT", data, callback);
   },
-  
+
   deleteWebForward: function(domain, id, callback) {
     Badger.api("domains/" + domain + "/web_forwards/" + id, "DELETE", callback);
   },
-  
+
 
   // Comment out until used
   // getDomainSearchHistory: function(callback) {
   //   Badger.api("domains/search_history", callback);
   // },
-  // 
+  //
   // createDomainSearchHistory: function(data, callback) {
   //   Badger.api("domains/search_history", "POST", data, callback);
   // },
@@ -511,7 +515,7 @@ var Badger = {
   sendInvite: function(data, callback) {
     Badger.api("/account/send_invite", "POST", { first_name: data.first_name, last_name: data.last_name, email: data.invitation_email, credits_to_gift: data.credits_to_gift, custom_message: data.custom_message }, callback);
   },
-  
+
   revokeInvite: function(invite_id, callback) {
     Badger.api("/account/revoke_invite", "POST", { invite_id: invite_id }, callback);
   },
@@ -523,27 +527,27 @@ var Badger = {
   getInviteStatus: function(callback) {
     Badger.api("/account/all_sent_invites", callback);
   },
-  
+
   getInvite: function(invite_code, callback) {
     Badger.api('/account/invites/' + invite_code, callback);
   },
-  
+
   getReferralCodes: function(callback) {
     Badger.api('/account/referral_codes', callback);
   },
-  
+
   getReferralCode: function(slug, callback) {
     Badger.api('/account/referral_codes/' + slug, callback);
   },
-  
+
   createReferralCode: function(data, callback) {
     Badger.api('/account/referral_codes', 'POST', data, callback);
   },
-  
+
   updateReferralCode: function(slug, updates, callback) {
     Badger.api('/account/referral_codes/' + slug, 'PUT', data, callback);
   },
-  
+
   redeemRewardPoints: function(callback) {
     Badger.api('/account/rewards/redeem_points', 'POST', callback);
   },
@@ -559,44 +563,44 @@ var Badger = {
   createLinkedAccount: function(data, callback) {
     Badger.api("/linked_accounts", "POST", data, callback);
   },
-  
+
   updateLinkedAccount: function(id, data, callback) {
     Badger.api("/linked_accounts/" + id, "PUT", data, callback);
   },
-  
+
   getLinkedAccounts: function(callback) {
     Badger.api("/linked_accounts", callback);
   },
-  
+
   getLinkedAccount: function(id, callback) {
     Badger.api("/linked_accounts/" + id, callback);
   },
-  
+
   deleteLinkedAccount: function(id, callback) {
     Badger.api("/linked_accounts/" + id, "DELETE", callback);
   },
-  
+
   getAuthorizedAccountInfo: function(linked_account_id, callback) {
     Badger.api("/linked_accounts/" + linked_account_id + "/remote_info", callback);
   },
-  
+
   shareMessage: function(linked_account_ids, data, callback) {
     if (typeof(linked_account_ids) == 'number') { linked_account_ids = [linked_account_ids] }
     Badger.api("linked_accounts/share_message", "POST", { message: message, linked_account_ids: linked_account_ids }, callback);
   },
-  
+
   // shareDomainRegistration: function(linked_account_id, domain_name, hide_share_messages, callback) {
   //  Badger.api("/linked_accounts/" + linked_account_id + "/share_registration", "POST", { domain_name: domain_name, hide_share_messages: hide_share_messages }, callback);
   // },
-  // 
+  //
   // shareDomainBulkRegistration: function(linked_account_id, domain_name, num_domains, hide_share_messages, callback) {
   //  Badger.api("/linked_accounts/" + linked_account_id + "/share_bulk_registration", "POST", { domain_name: domain_name, num_domains: num_domains, hide_share_messages: hide_share_messages }, callback);
   // },
-  // 
+  //
   // shareDomainTransfer: function(linked_account_id, num_domains, hide_share_messages, callback) {
   //  Badger.api("/linked_accounts/" + linked_account_id + "/share_transfer", "POST", { num_domains: num_domains, hide_share_messages: hide_share_messages }, callback);
   // },
-  
+
   getBlogs: function(callback) {
     Badger.api("/blogs", callback);
   },
@@ -652,69 +656,69 @@ var Badger = {
   //     callback(records);
   //   });
   // },
-  // 
+  //
   // getRecord: function(accessToken, name, id, callback) {
   //   Badger.api("/domains/" + name + "/records/" + id, { headers: { access_token: accessToken } }, function(record) {
   //     callback(record);
-  //   });   
+  //   });
   // },
-  // 
-  // 
+  //
+  //
   // deleteRecordsByType: function(accessToken, name, type, callback) {
   //   Badger.api("/domains/" + name + "/records/" + type, { type: "DELETE", headers: { access_token: accessToken } }, function(resp) {
   //     callback(resp);
-  //   });   
+  //   });
   // },
-  // 
+  //
   // updateRecord: function(accessToken, name, id, data, callback) {
   //   Badger.api("/domains/" + name + "/records/" + id, { type: "PUT", headers: { access_token: accessToken }, data: data }, function(resp) {
   //     callback(resp);
   //   });
-  // },  
-  // 
+  // },
+  //
   // showAccount: function(accessToken, callback) {
   //   Badger.api("/account", function(account) {
   //     callback(account);
   //   });
   // },
-  // 
+  //
   // checkEmail: function(email, callback) {
   //   Badger.api("/account/check_email", 'POST', { email: email }, callback);
   // },
-  // 
-  // 
+  //
+  //
   // updateAccount: function(accessToken, data, callback) {
   //   Badger.api("/account", "POST", data, callback);
   // },
-  // 
+  //
   // resetPassword: function(email, newPassword, code, callback) {
   //   Badger.api("/account/reset_password", { type: "POST", data: { email: email, new_password: newPassword, code: code} }, function(resp) {
   //     callback(resp);
   //   });
   // },
-  // 
+  //
   // changePassword: function(accessToken, newPassword, callback) {
   //   Badger.api("/account/change_password", { type: "POST", headers: { access_token: accessToken }, data: { new_password: newPassword } }, function(resp) {
   //     callback(resp);
   //   });
   // },
-  // 
+  //
   // unregisterDomain: function(accessToken, name, callback) {
   //   Badger.api("/domains/" + name, { type: "DELETE", headers: { access_token: accessToken } }, function(resp) {
   //     callback(resp);
   //   });
   // },
-  // 
+  //
   // renewDomain: function(accessToken, data, callback) {
   //   Badger.api("/domains/" + data.name + "/renew", { type: "PUT", headers: { access_token: accessToken }, data: data }, function(resp) {
   //     callback(resp);
   //   });
   // },
-  // 
+  //
   // getWhois: function(accessToken, name, callback) {
   //   Badger.api("/domains/" + name + "/whois", { headers: { access_token: accessToken } }, function(whois) {
   //     callback(whois);
   //   });
   // },
-  
+
 };
