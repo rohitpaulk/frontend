@@ -1,22 +1,24 @@
-with (Hasher('EmailForwards', 'DomainApps')) {
+with (Hasher('EmailForwardsDeprecated', 'DomainApps')) {
 
   register_domain_app({
-    id: 'badger_email_forward',
-    name: 'Email Forwarding',
-    menu_item: { text: 'Email Forwarding', href: '#domains/:domain/apps/email_forwards', css_class: 'email-forwarding' },
+    id: 'badger_email_forward_deprecated',
+    name: 'Email Forwarding (DEPRECATED)',
+    menu_item: { text: 'Email Forwarding', href: '#domains/:domain/apps/email_forwards_deprecated', css_class: 'email-forwarding' },
     icon: 'images/apps/email-forward.png',
     requires: {
       dns: [
-        { type: 'mx', priority: 10, content: "30147198.in1.mandrillapp.com" },
-        { type: 'mx', priority: 20, content: "30147198.in2.mandrillapp.com" },
+        { type: 'mx', priority: 10, content: "mxa.mailgun.org" },
+        { type: 'mx', priority: 10, content: "mxb.mailgun.org" },
+        { type: 'txt', content: 'v=spf1 include:mailgun.org ~all' }
       ]
     },
 
     install_screen: function(app, domain_obj) {
       return div(
-        p("Install this app to forward your email of this domain to another email account."),
-        form({ action: curry(install_app_button_clicked, app, domain_obj) },
-          show_required_dns(app, domain_obj),
+        p("This application is deprecated and is only here for legacy purposes."),
+        //form({ action: curry(install_app_button_clicked, Hasher.domain_apps['badger_email_forward'], domain_obj) },
+        form({ action: curry(install_app_button_clicked, Hasher.domain_apps['badger_email_forward'], domain_obj) },
+          show_required_dns(Hasher.domain_apps['badger_email_forward'], domain_obj),
           input({ 'class': 'myButton', type: 'submit', style: 'margin-top: 10px', value: 'Install Email Forwarding' })
         )
       );
@@ -24,14 +26,14 @@ with (Hasher('EmailForwards', 'DomainApps')) {
 
   });
 
-  route('#domains/:domain/apps/email_forwards', function(domain) {
-    with_domain_nav_for_app(domain, Hasher.domain_apps['badger_email_forward'], function(nav_table, domain_obj) {
+  route('#domains/:domain/apps/email_forwards_deprecated', function(domain) {
+    with_domain_nav_for_app(domain, Hasher.domain_apps['badger_email_forward_deprecated'], function(nav_table, domain_obj) {
       render(
         div({ id: 'email-forwards-wrapper' },
           h1_for_domain(domain, 'Email Forwards'),
 
           nav_table(
-            domain_app_settings_button('badger_email_forward', domain),
+            domain_app_settings_button('badger_email_forward_deprecated', domain),
 
             div({ id: 'email-forwards-errors' }),
 
@@ -114,5 +116,6 @@ with (Hasher('EmailForwards', 'DomainApps')) {
       });
     }
   });
+
 
  };
