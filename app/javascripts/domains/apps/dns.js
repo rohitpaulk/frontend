@@ -616,6 +616,7 @@ define('get_dns_params', function(id) {
         option({ value: 'ns.rackspace.com,ns2.rackspace.com' }, 'Rackspace'),
         option({ value: 'ns1.slicehost.com,ns2.slicehost.com,ns3.slicehost.com' }, 'SliceHost'),
         option({ value: 'ns1.softlayer.com,ns2.softlayer.com' }, 'SoftLayer'),
+        option({ value: 'ns1.wordpress.com,ns2.wordpress.com,ns3.wordpress.com' }, 'Wordpress'),
         option({ value: 'a.ns.zerigo.net,b.ns.zerigo.net,c.ns.zerigo.net,d.ns.zerigo.net,e.ns.zerigo.net,f.ns.zerigo.net' }, 'Zerigo')
       ),
       
